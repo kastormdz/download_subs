@@ -27,7 +27,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
 ################ CONFIG ###########################################
 export SERIES="/home/samba/series"
 export LOGFILE="/tmp/subs.log"
@@ -69,6 +68,8 @@ LANGUAGES_str[25]="Slovak"
 
 BASE="http://www.subtitulos.es"
 
+chapterpage=$(mktemp)
+trap "rm $chapterpage" 0
 TOTAL="$#"
 already_done=1
 while [ "$1" ];do
@@ -180,7 +181,6 @@ function chksub()
    fi
 
 }
-
 
 export -f logger
 export -f download
