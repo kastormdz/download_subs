@@ -31,15 +31,16 @@
 export SERIES="/home/samba/series"
 export LOGFILE="/tmp/subs.log"
 export VERBOSE=0
-#
+
 # Please check your language preference
 ################ CONFIG ###########################################
 
 function download () {
 
-# Language iteration list (blank separated). If first do not exists, try next.
-LANGUAGES="6 5 4" 
-#####################################################################
+################################################################################
+# Language iteration list (blank separated). If first do not exists, try next. #
+LANGUAGES="6 5 4"                                                              #
+################################################################################
 
 #Language list obtained from http://www.subtitulos.es/newsub.php
 LANGUAGES_str[1]="English"
@@ -167,9 +168,10 @@ function chksub()
       cd "$p"
       logger "# Need SUB for $1"
       #convert format from 9X99 S99E99 & renaming
-      #fixme bug with season >9 
+      #fixme ** bug with season >9 
       tmp=`echo $1 |  egrep -i '[1-9]x[0-9][1-9]' `
       if [ $tmp ] ; then
+            #fixme better regex replace
             new=` echo $1 | sed 's/^\(.*\)\([0-9][Xx]\)\([0-9]\{2,2\}\)\(.*\)$/\1S0\2E\3\4/'| sed 's/xE/E/' `
             logger "# Converting to $new "
 	    mv "$1" "$new"
