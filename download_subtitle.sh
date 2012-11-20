@@ -1,9 +1,8 @@
 #!/bin/bash 
-export SUBS_VERSION="0.1"
 # 19/11/2012
 #
 # Author: Cristian Gimenez <cgimenez@gmail.com>
-# Author: Roberto Muñoz Gomez <munoz.roberto@gmail.com>
+# Based on work of Roberto Muñoz Gomez <munoz.roberto@gmail.com>
 #
 # Description: Script to download subtitles of Tv Shows from subtitulos.es or any other
 # webpage based on wikisubtitles
@@ -39,10 +38,7 @@ export VERBOSE=0
 
 function download () {
 
-DEBUG="" #Initialize this variable to enable debug mode
-#DEBUG="YES"
-
-#Language iteration list (blank separated). If first do not exists, try next.
+# Language iteration list (blank separated). If first do not exists, try next.
 LANGUAGES="6 5 4" 
 #####################################################################
 
@@ -72,23 +68,6 @@ LANGUAGES_str[24]="Chinese"
 LANGUAGES_str[25]="Slovak"
 
 BASE="http://www.subtitulos.es"
-
-chapterpage=$(mktemp)
-trap "rm $chapterpage" 0
-if [ "$DEBUG" ];then
-	log=$(mktemp)
-	cat > $log <<-EOF
-	THIS IS THE DEBUG OUTPUT
-	IF YOU DO NOT WANT TO SEE THIS MESSAGE
-	UNINITALIZE THE DEBUG VARIABLE IN $0
-
-	----------------8<----------------8<----------------
-
-	EOF
-	trap "dialog --textbox $log 30 50;rm $log $chapterpage" 0
-	set -x
-	exec &>> $log
-fi
 
 TOTAL="$#"
 already_done=1
@@ -210,13 +189,8 @@ export -f chksub
 case "$1" in '-v')
  VERBOSE=1
 ;;
-'--version')
-echo "Download Subs Version: $SUBS_VERSION "
-exit
-;;
 '--help')
 echo "Download Subs Help "
-echo "--version   Show Version"
 echo "-v   Verbose screen mode"
 echo " "
 exit
