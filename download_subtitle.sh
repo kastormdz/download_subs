@@ -193,6 +193,9 @@ case "$1" in '-v')
 ;;
 '--help')
 echo "Download Subs Help "
+echo "                   "
+echo "Usage: download_subs.sh [tv_show_file] "
+echo "[tv_show_file] is optional, by default it searchs "
 echo "-v   Verbose screen mode"
 echo " "
 exit
@@ -201,7 +204,13 @@ exit
 esac
 
 logger "##########################  Download Subs INIT ##########################"
-find $SERIES \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c 'chksub {}' \;
+
+if [ -f $1 ] ; then
+	logger "# Processing file $1 "
+	chksub $1
+else
+	find $SERIES \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c 'chksub {}' \;
+fi
 
 
 
