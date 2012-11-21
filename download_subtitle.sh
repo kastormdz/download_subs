@@ -31,6 +31,7 @@
 export SERIES="/home/samba/series"
 export LOGFILE="/tmp/subs.log"
 export VERBOSE=0
+export NEED=0
 
 # Please check your language preference
 ################ CONFIG ###########################################
@@ -176,7 +177,9 @@ function chksub()
             logger "# Converting to $new "
 	    mv "$1" "$new"
             download "$new"
+            ((NEED++))
       else
+	   ((NEED++))
            download "$1"
       fi	   
    
@@ -205,13 +208,19 @@ esac
 
 logger "##########################  Download Subs INIT ##########################"
 
-if [ -f $1 ] ; then
+if [ -f "$1" ] ; then
 	logger "# Processing file $1 "
 	chksub $1
-else
-	find $SERIES \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c 'chksub {}' \;
+	exit
 fi
 
+find $SERIES \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c 'chksub {}' \;
+
+if [ $NEED == 0 ] ; then
+	logger "# No need to download subs.. Everything is up-to-date. Bye."
+fi
+
+logger "##########################  Download Subs END  ##########################"
 
 
 
