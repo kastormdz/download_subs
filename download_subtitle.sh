@@ -30,7 +30,8 @@
 ################ CONFIG ###########################################
 export SERIES="/home/samba/series"
 export LOGFILE="/tmp/subs.log"
-export VERBOSE=0
+export VERBOSE=1
+export LOGG=0
 export NEED=0
 
 # Please check your language preference
@@ -150,7 +151,10 @@ done
 
 function logger() {
  timestamp=$(date "+%d/%m/%Y %H:%M")
- echo "$timestamp  $1 " >> $LOGFILE
+ if [ $LOGG == 1 ] ; then
+	 echo "$timestamp  $1 " >> $LOGFILE
+ fi
+
  if [ $VERBOSE == 1 ] ; then
     echo "$timestamp  $1 "
  fi
@@ -191,7 +195,7 @@ export -f logger
 export -f download
 export -f chksub 
 
-case "$1" in '-v')
+case "$1" in '-l')
  VERBOSE=1
 ;;
 '--help')
@@ -199,7 +203,7 @@ echo "Download Subs Help "
 echo "                   "
 echo "Usage: download_subs.sh [tv_show_file] "
 echo "[tv_show_file] is optional, by default it searchs "
-echo "-v   Verbose screen mode"
+echo "-l  verbose to logfile "
 echo " "
 exit
 ;;
