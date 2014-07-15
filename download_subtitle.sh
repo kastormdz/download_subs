@@ -28,7 +28,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ################ CONFIG ###########################################
-export SERIES="/home/samba/series"
+export SERIES="/home/samba/media/series"
 export LOGFILE="/tmp/subs.log"
 export VERBOSE=1
 export LOGG=0
@@ -172,20 +172,38 @@ function chksub()
       EXIST=0
       cd "$p"
       logger "# Need SUB for $1"
-      #convert format from 9X99 S99E99 & renaming
-      #fixme ** bug with season >9 
+
       tmp=`echo $1 |  egrep -i '[1-9]x[0-9][1-9]' `
       if [ $tmp ] ; then
             #fixme better regex replace
+	    #format 9X00
             new=` echo $1 | sed 's/^\(.*\)\([0-9][Xx]\)\([0-9]\{2,2\}\)\(.*\)$/\1S0\2E\3\4/'| sed 's/xE/E/' `
             logger "# Converting to $new "
-	    mv "$1" "$new"
+	    mv "$1" "$new" 
             download "$new"
             ((NEED++))
-      else
+	    bajado=1
+      fi
+
+      #convert format from 9X99 S99E99 & renaming
+      #fixme ** bug with season >9 
+      tmp=`echo $1 |  egrep -i '[1-9][0-9][0-9]\.' `
+      if [ $tmp ] ; then
+	   #format 900
+	    new=`echo $1 | sed 's/^\(.*\)\.\([0-9]\)\([0-9]\{2,2\}\)\(.*\)$/\1.S0\2E\3\4/'| sed 's/xE/E/' `
+	    if [ "$1" != "$new" ] ; then
+               logger "# Converting to $new "
+	       mv $1 $new
+            fi
+            download "$new"
+            ((NEED++))
+	    bajado=1
+      fi
+
+      if ! [ $bajado ] ; then 
 	   ((NEED++))
            download "$1"
-      fi	   
+     fi	   
    
    fi
 
