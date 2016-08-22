@@ -14,6 +14,12 @@ export code=0
 ################ CONFIG ###########################################
 
 
+########################################################################
+# FIXME: tenes que crear un archivo de nombre serie
+#        en el directorio de la serie conteniendo el codigo de la serie
+#        sacado de https://www.tusubtitulo.com/series.php
+########################################################################
+
 
 function download () {
 
