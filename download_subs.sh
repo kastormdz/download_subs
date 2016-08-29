@@ -16,6 +16,12 @@ export EXIST=0
 ################ CONFIG ###########################################
 
 
+# Tratando de obtener la lista de codigos ########
+if [ ! -f "/tmp/series.php" ] ; then
+   #echo "Bajando listado de series"
+   wget http://tusubtitulo.com/series.php -qO /tmp/series.php
+fi	
+
 function download () {
 
 LANGUAGES="6 5"                                                              #
@@ -49,12 +55,6 @@ LANGUAGES_str[25]="Slovak"
 AGENT2="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
 AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
 BASE="http://www.tusubtitulo.com"
-
-# Tratando de obtener la lista de codigos ########
-if [ ! -f "/tmp/series.php" ] ; then
-   echo "Bajando listado de series"
-   wget http://tusubtitulo.com/series.php -qO /tmp/series.php
-fi	
 
 chapterpage=$(mktemp)
 trap "rm $chapterpage" 0
