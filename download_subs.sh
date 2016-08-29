@@ -2,6 +2,7 @@
 # 19/11/2012
 # 08/03/2016
 # 22/08/2016
+# 29/08/2016
 # Author: Cristian Gimenez <cgimenez@gmail.com>
 #
 ################ CONFIG ###########################################
@@ -11,22 +12,16 @@ export VERBOSE=1
 export LOGG=0
 export NEED=0
 export code=0
+export EXIST=0
 ################ CONFIG ###########################################
-
-
-########################################################################
-# FIXME: tenes que crear un archivo de nombre serie
-#        en el directorio de la serie conteniendo el codigo de la serie
-#        sacado de https://www.tusubtitulo.com/series.php
-########################################################################
 
 
 function download () {
 
-
 LANGUAGES="6 5"                                                              #
 
 #Listado de idiomas sacados de http://www.tusubtitulo.com/newsub.php
+
 LANGUAGES_str[1]="English"
 LANGUAGES_str[10]="Brazilian"
 LANGUAGES_str[11]="German"
@@ -51,9 +46,15 @@ LANGUAGES_str[23]="Hebrew"
 LANGUAGES_str[24]="Chinese"
 LANGUAGES_str[25]="Slovak"
 
-AGENT2="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36"
-AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36"
+AGENT2="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
+AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
 BASE="http://www.tusubtitulo.com"
+
+# Tratando de obtener la lista de codigos ########
+if [ ! -f "/tmp/series.php" ] ; then
+   echo "Bajando listado de series"
+   wget http://tusubtitulo.com/series.php -qO /tmp/series.php
+fi	
 
 chapterpage=$(mktemp)
 trap "rm $chapterpage" 0
@@ -76,11 +77,13 @@ while [ "$1" ];do
 	FILE="$(basename "$ORIGINAL_FILENAME")"
 	#logger "# ($already_done/$TOTAL) Parsing $FILE..."
 	SHOW="$(echo "$FILE"|sed -e "s/^\(.*\)\.[sS][0-9]\+[eE][0-9]\+[\.-].*$/\1/g")" 
+	# --------- obteniendo codigo ---------------
+	SHOWNAME=${SHOW//./ } 
+	code="$(cat /tmp/series.php | grep -o '<a .*href=.*>'| sed -e 's/<a/\n<a/g' | grep -i "$SHOWNAME" | tail -n 1 | cut -d / -f 3 | sed -e 's/\".*$//')"
+	# -------------------------------------------
 	SHOW=${SHOW//./-} 
-
 	#Formato de subtitulos.es
 	CHAPTER="$(echo "$FILE"|sed -e "s/.*[sS]\([0-9]\+\)[eE]\([0-9]\+\).*/\1x\2/g" )" #Parseo de caps tipo 03x04
-
 	SHOW="$(echo $SHOW | awk '{print tolower($0)}')"
         
 	#Formato de tusubtitulo.com
@@ -97,7 +100,7 @@ while [ "$1" ];do
                   
 		URLCHAPTER="$BASE/serie/$SHOW/$temporada/$capitulo/$code"  #tusubtitulo.com
 		wget -qO $chapterpage "$URLCHAPTER" --user-agent="$AGENT"
-		cat $chapterpage > /tmp/sub.txt
+		#cat $chapterpage > /tmp/sub.txt
 		#echo $URLCHAPTER
 		#chaptercode="$(cat $chapterpage |sed  -n "s/.*ajax_getComments.php?id=\([0-9]\+\).*/\1/gp")"
 		chaptercode="$(cat $chapterpage | grep subID | head -n1  | awk '{ print $4 }'| tr -d ';')"
@@ -160,19 +163,6 @@ function chksub()
    name=$file"srt"
    EXIST="0"
    ignore=$p/"ignore"
-
-   if [ -f "../../serie" ] ; then
-	   code=`cat ../../serie`
-   else
-        if [ -f "../serie" ] ; then
-	  code=`cat ../serie`
-        fi
-   fi
- 
-   if [ $code == "0" ] ; then
-	   EXIST=1
-	   #echo "#  No SERIE CODE for $1 #######################################"
-   fi
 
    if [ -f "$ignore" ] ; then
       EXIST=1
