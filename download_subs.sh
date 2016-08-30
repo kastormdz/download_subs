@@ -202,8 +202,8 @@ if [ -f "$1" ] ; then
 	exit
 fi
 
-if [ -f $SERIES_HOME ] ; then
-   find $SERIES_HOME \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c "chksub {}" \; 2>/dev/null
+if [ -d "$SERIES_HOME" ] ; then
+   find "$SERIES_HOME" \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c "chksub {}" \; 2>/dev/null
 else
 	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
 fi
