@@ -1,4 +1,5 @@
 #!/usr/bin/bash 
+# download_subs.sh
 # 19/11/2012
 # 08/03/2016
 # 22/08/2016
@@ -12,7 +13,17 @@ export NEED=0
 export code=0
 export EXIST=0
 export SERIES_LIST="/tmp/series.php"
-
+# Tratando de evitar el ban (no les gusta los scripts)
+export AGENT2="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
+export AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
+export BASE="http://www.tusubtitulo.com"
+#Orden de Lenguaje a Bajar
+export LANGUAGES="6 5"  
+#Listado de idiomas sacados de http://www.tusubtitulo.com/newsub.php
+export LANGUAGES_str[1]="English"
+export LANGUAGES_str[4]="Español"
+export LANGUAGES_str[5]="Español (España)"
+export LANGUAGES_str[6]="Español (Latinoamérica)"
 ################ CONFIG ###########################################
 
 
@@ -23,38 +34,7 @@ if [ ! -f "$SERIES_LIST" ] ; then
 fi	
 
 function download () {
-
-	LANGUAGES="6 5"                                                              #
-	#Listado de idiomas sacados de http://www.tusubtitulo.com/newsub.php
-	LANGUAGES_str[1]="English"
-	LANGUAGES_str[10]="Brazilian"
-	LANGUAGES_str[11]="German"
-	LANGUAGES_str[12]="Català"
-	LANGUAGES_str[13]="Euskera"
-	LANGUAGES_str[14]="Czech"
-	LANGUAGES_str[15]="Galego"
-	LANGUAGES_str[16]="Turkish"
-	LANGUAGES_str[17]="Nederlandse"
-	LANGUAGES_str[18]="Swedish"
-	LANGUAGES_str[19]="Russian"
-	LANGUAGES_str[4]="Español"
-	LANGUAGES_str[5]="Español (España)"
-	LANGUAGES_str[6]="Español (Latinoamérica)"
-	LANGUAGES_str[7]="Italian"
-	LANGUAGES_str[8]="French"
-	LANGUAGES_str[9]="Portuguese"
-	LANGUAGES_str[20]="Hungarian"
-	LANGUAGES_str[21]="Polish"
-	LANGUAGES_str[22]="Slovenian"
-	LANGUAGES_str[23]="Hebrew"
-	LANGUAGES_str[24]="Chinese"
-	LANGUAGES_str[25]="Slovak"
-
-	# Tratando de evitar el ban (no les gusta los scripts)
-	AGENT2="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
-	AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
-	BASE="http://www.tusubtitulo.com"
-
+        
 chapterpage=$(mktemp)
 trap "rm $chapterpage" 0
 
@@ -192,6 +172,8 @@ function chksub()
    fi
 
 }
+
+#MAIN################
 
 export -f download
 export -f chksub 
