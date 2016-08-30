@@ -3,26 +3,25 @@
 # 19/11/2012
 # 08/03/2016
 # 22/08/2016
-# 29/08/2016
+# 30/08/2016
 # Author: Cristian Gimenez <cgimenez@gmail.com>
 
-################ CONFIG ###########################################
+################ CONFIG ################################################################################################
 export SERIES_HOME="/home/samba/series/"
 export VERBOSE=1
 export NEED=0
 export code=0
 export EXIST=0
 export SERIES_LIST="/tmp/series.html"
-# Tratando de evitar el ban (no les gusta los scripts)
-export AGENT2="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
+# Tratando de evitar el ban (no les gusta los scripts asi q nos identificamos como un browser mas..)
 export AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
 export BASE="http://www.tusubtitulo.com"
 #Orden de Lenguaje a Bajar
 export LANGUAGES="6 5"  
-############### CONFIG ###########################################
+############### CONFIG #################################################################################################
 
 
-# Tratando de obtener la lista de codigos ########
+# Tratando de obtener la lista de codigos 
 if [  -f "$SERIES_LIST" ] ; then
    find $SERIES_LIST -mtime +1 -exec rm -f {} \;
 fi	
@@ -33,11 +32,12 @@ fi
 function download () {
  
 #Listado de idiomas sacados de http://www.tusubtitulo.com/newsub.php
-export LANGUAGES_str[1]="English"
-export LANGUAGES_str[4]="Español"
-export LANGUAGES_str[5]="Español (España)"
-export LANGUAGES_str[6]="Español (Latinoamérica)"
-#       
+LANGUAGES_str[1]="English"
+LANGUAGES_str[4]="Español"
+LANGUAGES_str[5]="Español (España)"
+LANGUAGES_str[6]="Español (Latinoamérica)"
+
+
 chapterpage=$(mktemp)
 trap "rm $chapterpage" 0
 
@@ -76,13 +76,9 @@ while [ "$1" ];do
                   
 		URLCHAPTER="$BASE/serie/$SHOW/$temporada/$capitulo/$code"  #tusubtitulo.com
 		wget -qO $chapterpage "$URLCHAPTER" --user-agent="$AGENT"
-		#cat $chapterpage > /tmp/sub.txt
-		#echo $URLCHAPTER
 		#chaptercode="$(cat $chapterpage |sed  -n "s/.*ajax_getComments.php?id=\([0-9]\+\).*/\1/gp")"
-		chaptercode="$(cat $chapterpage | grep subID | head -n1  | awk '{ print $4 }'| tr -d ';')"
+		chaptercode="$(cat $chapterpage | grep subID | head -n1  | awk '{ print $4 }'| tr -d ';')" #fix 2016
 		[ "$chaptercode" ] && break || sleep 1
-		#echo $chaptercode
-		#exit
 	done
 
 	if [ -z "$chaptercode" ] ; then
@@ -127,14 +123,14 @@ function chksub()
    file=$(echo "$1" | sed 's/mp4//'  | sed 's/srt//' | sed 's/mkv//' | sed 's/avi//' )
    name=$file"srt"
    EXIST="0"
+   #Crear con un "touch ignore" en el directorio de la serie para q no te baje subs de ahi
    ignore=$p/"ignore"
 
-   if [ -f "$ignore" ] ; then
-      EXIST=1
+   if [ -f "$ignore" ] ; then 
+	   EXIST=1 
    fi
-
-   if [ -f "$name" ] ; then
-      EXIST=1
+   if [ -f "$name" ] ; then 
+	   EXIST=1
    fi
 
    if [ $EXIST == "0" ] ; then 
@@ -142,7 +138,7 @@ function chksub()
       cd "$p"
       echo -n "# Procesando $1 >> "
 
-      tmp=`echo $1 |  egrep -i '[1-9]x[0-9][1-9]' `
+      tmp=$(echo $1 |  egrep -i '[1-9]x[0-9][1-9]')
       if [ $tmp ] ; then
             #fixme better regex replace
 	    #format 9X00
@@ -153,11 +149,11 @@ function chksub()
 	    bajado=1
       fi
       #convert format from 9X99 S99E99 & renaming
-      #fixme ** bug with season >9 
-      tmp=`echo $1 |  egrep -i '[1-9][0-9][0-9]\.' `
+      #fixme ** bug con temporada >9  por ej Bones
+      tmp=$(echo $1 |  egrep -i '[1-9][0-9][0-9]\.')
       if [ $tmp ] ; then
 	   #format 900
-	    new=`echo $1 | sed 's/^\(.*\)\.\([0-9]\)\([0-9]\{2,2\}\)\(.*\)$/\1.S0\2E\3\4/'| sed 's/xE/E/' `
+	   new=$(echo $1 | sed 's/^\(.*\)\.\([0-9]\)\([0-9]\{2,2\}\)\(.*\)$/\1.S0\2E\3\4/'| sed 's/xE/E/')
 	    if [ "$1" != "$new" ] ; then
                echo "# Convirtiendo a  $new "
 	       mv $1 $new
@@ -201,8 +197,11 @@ if [ -f "$1" ] ; then
 	exit
 fi
 
-find $SERIES_HOME \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c "chksub {}" \; 2>/dev/null
-
+if [ -f $SERIES_HOME ] ; then
+   find $SERIES_HOME \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c "chksub {}" \; 2>/dev/null
+else
+	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
+fi
 
 
 
