@@ -1,15 +1,10 @@
 download_subs.sh
 ================
 
-Subtitle Download Script mkv,mp4,avi files 
+Script Downloader de Subs para *mkv,mp4,avi  para http://www.tusubtitulo.com/
 
-Only tested on http://www.tusubtitulo.com/
-
-Description: Script to download subtitles of Tv Shows from tusubitulo.com
-
-Descripcion; Script para bajar subtitulos de series desde tusubititulo.com
-
-
-Change Preference editing the script config section.
+Warning: No es para bajar los subs masivamente, sino para automatizar un poco
+         si ves muchas series y es incomodo bajar uno por uno.
+         Si te abusas del sitio, te banean.
 
 

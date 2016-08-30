@@ -8,17 +8,18 @@
 ################ CONFIG ###########################################
 export SERIES_HOME="/home/samba/series/"
 export VERBOSE=1
-export LOGG=0
 export NEED=0
 export code=0
 export EXIST=0
+export SERIES_LIST="/tmp/series.php"
+
 ################ CONFIG ###########################################
 
 
 # Tratando de obtener la lista de codigos ########
-if [ ! -f "/tmp/series.php" ] ; then
-   #echo "Bajando listado de series"
-   wget http://tusubtitulo.com/series.php -qO /tmp/series.php
+find $SERIES_LIST -mtime +1 -exec rm -f {} \;
+if [ ! -f "$SERIES_LIST" ] ; then
+   wget http://tusubtitulo.com/series.php -qO $SERIES_LIST
 fi	
 
 function download () {
@@ -57,9 +58,6 @@ function download () {
 chapterpage=$(mktemp)
 trap "rm $chapterpage" 0
 
-#chapterpage=/tmp/sub.dat
-#> $chapterpage
-#set -x
 TOTAL="$#"
 already_done=1
 while [ "$1" ];do
@@ -87,7 +85,6 @@ while [ "$1" ];do
 	temporada="$(echo $C2 | cut -d "/" -f 1 | sed 's/^0//' )"
 	capitulo="$(echo $C2 | cut -d "/" -f 2 | sed 's/^0//' )"
 
-	#set -x
 	SHOW_orig="$SHOW"
 	for regexp_show in "" 's/-\([^-]*\)$/-(\1)/' 's/-[^-]*$//g';do
 		# If first guess with show title is wrong, try put the last word between (). Very useful for shows like V.(2009) because in the filename doesn't appear the ()
