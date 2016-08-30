@@ -19,22 +19,25 @@ export AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge
 export BASE="http://www.tusubtitulo.com"
 #Orden de Lenguaje a Bajar
 export LANGUAGES="6 5"  
+############### CONFIG ###########################################
+
+
+# Tratando de obtener la lista de codigos ########
+if [  -f "$SERIES_LIST" ] ; then
+   find $SERIES_LIST -mtime +1 -exec rm -f {} \;
+fi	
+if [ ! -f "$SERIES_LIST" ] ; then
+   wget http://tusubtitulo.com/series.php -qO $SERIES_LIST --user-agent="$AGENT"
+fi
+
+function download () {
+ 
 #Listado de idiomas sacados de http://www.tusubtitulo.com/newsub.php
 export LANGUAGES_str[1]="English"
 export LANGUAGES_str[4]="Español"
 export LANGUAGES_str[5]="Español (España)"
 export LANGUAGES_str[6]="Español (Latinoamérica)"
-################ CONFIG ###########################################
-
-
-# Tratando de obtener la lista de codigos ########
-find $SERIES_LIST -mtime +1 -exec rm -f {} \;
-if [ ! -f "$SERIES_LIST" ] ; then
-   wget http://tusubtitulo.com/series.php -qO $SERIES_LIST --user-agent="$AGENT"
-fi	
-
-function download () {
-        
+#       
 chapterpage=$(mktemp)
 trap "rm $chapterpage" 0
 
