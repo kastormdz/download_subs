@@ -12,7 +12,7 @@ export VERBOSE=1
 export NEED=0
 export code=0
 export EXIST=0
-export SERIES_LIST="/tmp/series.php"
+export SERIES_LIST="/tmp/series.html"
 # Tratando de evitar el ban (no les gusta los scripts)
 export AGENT2="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
 export AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
@@ -30,7 +30,7 @@ export LANGUAGES_str[6]="Español (Latinoamérica)"
 # Tratando de obtener la lista de codigos ########
 find $SERIES_LIST -mtime +1 -exec rm -f {} \;
 if [ ! -f "$SERIES_LIST" ] ; then
-   wget http://tusubtitulo.com/series.php -qO $SERIES_LIST
+   wget http://tusubtitulo.com/series.php -qO $SERIES_LIST --user-agent="$AGENT"
 fi	
 
 function download () {
@@ -56,11 +56,11 @@ while [ "$1" ];do
 	code="$(cat /tmp/series.php | grep -o '<a .*href=.*>'| sed -e 's/<a/\n<a/g' | grep -i "$SHOWNAME" | tail -n 1 | cut -d / -f 3 | sed -e 's/\".*$//')"
 	# -------------------------------------------
 	SHOW=${SHOW//./-} 
-	#Formato de subtitulos.es
+	# Formato de subtitulos.es
 	CHAPTER="$(echo "$FILE"|sed -e "s/.*[sS]\([0-9]\+\)[eE]\([0-9]\+\).*/\1x\2/g" )" #Parseo de caps tipo 03x04
 	SHOW="$(echo $SHOW | awk '{print tolower($0)}')"
         
-	#Formato de tusubtitulo.com
+	# Formato de tusubtitulo.com
 	C2="$(echo "$CHAPTER" | sed -e "s/x/\//")"
 	temporada="$(echo $C2 | cut -d "/" -f 1 | sed 's/^0//' )"
 	capitulo="$(echo $C2 | cut -d "/" -f 2 | sed 's/^0//' )"
