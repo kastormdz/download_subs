@@ -4,10 +4,9 @@
 # 22/08/2016
 # 29/08/2016
 # Author: Cristian Gimenez <cgimenez@gmail.com>
-#
+
 ################ CONFIG ###########################################
-export SERIES="/home/samba/series/"
-export LOGFILE="/tmp/subs.log"
+export SERIES_HOME="/home/samba/series/"
 export VERBOSE=1
 export LOGG=0
 export NEED=0
@@ -24,37 +23,36 @@ fi
 
 function download () {
 
-LANGUAGES="6 5"                                                              #
+	LANGUAGES="6 5"                                                              #
+	#Listado de idiomas sacados de http://www.tusubtitulo.com/newsub.php
+	LANGUAGES_str[1]="English"
+	LANGUAGES_str[10]="Brazilian"
+	LANGUAGES_str[11]="German"
+	LANGUAGES_str[12]="Català"
+	LANGUAGES_str[13]="Euskera"
+	LANGUAGES_str[14]="Czech"
+	LANGUAGES_str[15]="Galego"
+	LANGUAGES_str[16]="Turkish"
+	LANGUAGES_str[17]="Nederlandse"
+	LANGUAGES_str[18]="Swedish"
+	LANGUAGES_str[19]="Russian"
+	LANGUAGES_str[4]="Español"
+	LANGUAGES_str[5]="Español (España)"
+	LANGUAGES_str[6]="Español (Latinoamérica)"
+	LANGUAGES_str[7]="Italian"
+	LANGUAGES_str[8]="French"
+	LANGUAGES_str[9]="Portuguese"
+	LANGUAGES_str[20]="Hungarian"
+	LANGUAGES_str[21]="Polish"
+	LANGUAGES_str[22]="Slovenian"
+	LANGUAGES_str[23]="Hebrew"
+	LANGUAGES_str[24]="Chinese"
+	LANGUAGES_str[25]="Slovak"
 
-#Listado de idiomas sacados de http://www.tusubtitulo.com/newsub.php
-
-LANGUAGES_str[1]="English"
-LANGUAGES_str[10]="Brazilian"
-LANGUAGES_str[11]="German"
-LANGUAGES_str[12]="Català"
-LANGUAGES_str[13]="Euskera"
-LANGUAGES_str[14]="Czech"
-LANGUAGES_str[15]="Galego"
-LANGUAGES_str[16]="Turkish"
-LANGUAGES_str[17]="Nederlandse"
-LANGUAGES_str[18]="Swedish"
-LANGUAGES_str[19]="Russian"
-LANGUAGES_str[4]="Español"
-LANGUAGES_str[5]="Español (España)"
-LANGUAGES_str[6]="Español (Latinoamérica)"
-LANGUAGES_str[7]="Italian"
-LANGUAGES_str[8]="French"
-LANGUAGES_str[9]="Portuguese"
-LANGUAGES_str[20]="Hungarian"
-LANGUAGES_str[21]="Polish"
-LANGUAGES_str[22]="Slovenian"
-LANGUAGES_str[23]="Hebrew"
-LANGUAGES_str[24]="Chinese"
-LANGUAGES_str[25]="Slovak"
-
-AGENT2="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
-AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
-BASE="http://www.tusubtitulo.com"
+	# Tratando de evitar el ban (no les gusta los scripts)
+	AGENT2="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
+	AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
+	BASE="http://www.tusubtitulo.com"
 
 chapterpage=$(mktemp)
 trap "rm $chapterpage" 0
@@ -68,14 +66,12 @@ while [ "$1" ];do
 	ORIGINAL_FILENAME="$(echo -e "$(echo $1|sed "s/%\([0-9a-fA-F][0-9a-fA-F]\)/\\\x\1/g")")" #Escapando los caracteres especiales
 	DIR="$(dirname "$ORIGINAL_FILENAME")"
 	if [ ! -d "$DIR" ];then
-		logger "# Error en  $DIR "
 		sleep 5
 		shift
 		continue
 	fi
 	pushd "$DIR" &>/dev/null
 	FILE="$(basename "$ORIGINAL_FILENAME")"
-	#logger "# ($already_done/$TOTAL) Parsing $FILE..."
 	SHOW="$(echo "$FILE"|sed -e "s/^\(.*\)\.[sS][0-9]\+[eE][0-9]\+[\.-].*$/\1/g")" 
 	# --------- obteniendo codigo ---------------
 	SHOWNAME=${SHOW//./ } 
@@ -145,21 +141,10 @@ done
 
 }
 
-function logger() {
- timestamp=$(date "+%d/%m/%Y %H:%M")
- if [ $LOGG == 1 ] ; then
-	 echo "$timestamp  $1 " >> $LOGFILE
- fi
-
- if [ $VERBOSE == 1 ] ; then
-    echo "$timestamp  $1 "
- fi
-}
-
 function chksub()
 {
    p=$PWD
-   file=`echo "$1" | sed 's/mp4//'  | sed 's/srt//' | sed 's/mkv//' | sed 's/avi//' `
+   file=$(echo "$1" | sed 's/mp4//'  | sed 's/srt//' | sed 's/mkv//' | sed 's/avi//' )
    name=$file"srt"
    EXIST="0"
    ignore=$p/"ignore"
@@ -182,7 +167,6 @@ function chksub()
             #fixme better regex replace
 	    #format 9X00
             new=` echo $1 | sed 's/^\(.*\)\([0-9][Xx]\)\([0-9]\{2,2\}\)\(.*\)$/\1S0\2E\3\4/'| sed 's/xE/E/' `
-            logger "# Converting to $new "
 	    mv "$1" "$new" 
             download "$new"
             ((NEED++))
@@ -195,7 +179,7 @@ function chksub()
 	   #format 900
 	    new=`echo $1 | sed 's/^\(.*\)\.\([0-9]\)\([0-9]\{2,2\}\)\(.*\)$/\1.S0\2E\3\4/'| sed 's/xE/E/' `
 	    if [ "$1" != "$new" ] ; then
-               echo "# Converting to $new "
+               echo "# Convirtiendo a  $new "
 	       mv $1 $new
             fi
             download "$new"
@@ -212,7 +196,6 @@ function chksub()
 
 }
 
-export -f logger
 export -f download
 export -f chksub 
 
@@ -220,6 +203,7 @@ case "$1" in '-l')
  VERBOSE=1
 ;;
 '--help')
+clear
 echo "Download Subs Help "
 echo "                   "
 echo "Uso: download_subs.sh [capitulo de la serie] "
@@ -235,7 +219,7 @@ if [ -f "$1" ] ; then
 	exit
 fi
 
-find $SERIES \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c "chksub {}" \; 2>/dev/null
+find $SERIES_HOME \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c "chksub {}" \; 2>/dev/null
 
 
 
