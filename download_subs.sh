@@ -9,9 +9,7 @@
 ################ CONFIG ################################################################################################
 export SERIES_HOME="/home/samba/series/"
 export VERBOSE=1
-export NEED=0
 export code=0
-export EXIST=0
 export SERIES_LIST="/tmp/series.html"
 # Tratando de evitar el ban (no les gusta los scripts asi q nos identificamos como un browser mas..)
 export AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
@@ -20,10 +18,10 @@ export BASE="http://www.tusubtitulo.com"
 export LANGUAGES="6 5"  
 ############### CONFIG #################################################################################################
 
-
 # Tratando de obtener la lista de codigos 
 if [  -f "$SERIES_LIST" ] ; then
-   find $SERIES_LIST -mtime +1 -exec rm -f {} \;
+	# Resfrescando la lista 1 dia, por si hay series nuevas
+	find $SERIES_LIST -mtime +1 -exec rm -f {} \;
 fi	
 if [ ! -f "$SERIES_LIST" ] ; then
    wget http://tusubtitulo.com/series.php -qO $SERIES_LIST --user-agent="$AGENT"
@@ -76,8 +74,8 @@ while [ "$1" ];do
                   
 		URLCHAPTER="$BASE/serie/$SHOW/$temporada/$capitulo/$code"  #tusubtitulo.com
 		wget -qO $chapterpage "$URLCHAPTER" --user-agent="$AGENT"
-		#chaptercode="$(cat $chapterpage |sed  -n "s/.*ajax_getComments.php?id=\([0-9]\+\).*/\1/gp")"
-		chaptercode="$(cat $chapterpage | grep subID | head -n1  | awk '{ print $4 }'| tr -d ';')" #fix 2016
+		#chaptercode="$(cat $chapterpage |sed  -n "s/.*ajax_getComments.php?id=\([0-9]\+\).*/\1/gp")" #old subtitulo.es
+		chaptercode="$(cat $chapterpage | grep subID | head -n1  | awk '{ print $4 }'| tr -d ';')" #fix tusubtitulo.com
 		[ "$chaptercode" ] && break || sleep 1
 	done
 
@@ -93,8 +91,6 @@ while [ "$1" ];do
 				completed="$(grep --text -B15 "jointranslation.php?id=$chaptercode&amp;fversion=[0-9]\+&amp;lang=$lang" $chapterpage| grep --text -o "[^[:space:]]\+%")"
 			else #Si esta listo
 				url="$(grep --text -o  "$URLSUB2/[0-9]\+"  $chapterpage | tail -n 1)"
-				#echo "## $URLSUB ## $url ##"
-				#exit
 				echo -n "BAJANDO sub en ${LANGUAGES_str[$lang]} >>>> "
 				if wget -q -O "${FILE%.*}.srt" --referer="$URLCHAPTER" "$BASE/$url" --user-agent="$AGENT"  ;then
 					echo " SUCCESS"
@@ -123,6 +119,7 @@ function chksub()
    file=$(echo "$1" | sed 's/mp4//'  | sed 's/srt//' | sed 's/mkv//' | sed 's/avi//' )
    name=$file"srt"
    EXIST="0"
+   NEED="0"
    #Crear con un "touch ignore" en el directorio de la serie para q no te baje subs de ahi
    ignore=$p/"ignore"
 
@@ -191,7 +188,6 @@ exit
 
 esac
 
-
 if [ -f "$1" ] ; then
 	chksub $1
 	exit
@@ -202,8 +198,5 @@ if [ -f $SERIES_HOME ] ; then
 else
 	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
 fi
-
-
-
 
 
