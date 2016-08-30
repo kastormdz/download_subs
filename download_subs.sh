@@ -54,7 +54,7 @@ while [ "$1" ];do
 	SHOW="$(echo "$FILE"|sed -e "s/^\(.*\)\.[sS][0-9]\+[eE][0-9]\+[\.-].*$/\1/g")" 
 	# --------- obteniendo codigo ---------------
 	SHOWNAME=${SHOW//./ } 
-	code="$(cat /tmp/series.php | grep -o '<a .*href=.*>'| sed -e 's/<a/\n<a/g' | grep -i "$SHOWNAME" | tail -n 1 | cut -d / -f 3 | sed -e 's/\".*$//')"
+	code="$(cat $SERIES_LIST | grep -o '<a .*href=.*>'| sed -e 's/<a/\n<a/g' | grep -i "$SHOWNAME" | tail -n 1 | cut -d / -f 3 | sed -e 's/\".*$//')"
 	# -------------------------------------------
 	SHOW=${SHOW//./-} 
 	# Formato de subtitulos.es
