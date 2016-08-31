@@ -55,6 +55,9 @@ while [ "$1" ];do
 	# --------- obteniendo codigo ---------------
 	SHOWNAME=${SHOW//./ } 
 	code="$(cat $SERIES_LIST | grep -o '<a .*href=.*>'| sed -e 's/<a/\n<a/g' | grep -i "$SHOWNAME" | tail -n 1 | cut -d / -f 3 | sed -e 's/\".*$//')"
+	if [ "$code" == "" ] ; then
+	       	echo "No se encontro codigo de serie >>>>$SHOWNAME<<<<< "
+	fi
 	# -------------------------------------------
 	SHOW=${SHOW//./-} 
 	# Formato de subtitulos.es
