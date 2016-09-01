@@ -191,7 +191,7 @@ exit
 
 esac
 
-if [ -f "$2" ] ; then
+if [ "$2" != "" ] ; then
 	# podes pasar el link directo del sub para q lo baje y lo renombre en caso de no encontrarlo
 	# formato: https://www.tusubtitulo.com/updated/6/51185/0
 	file=$(echo "$1" | sed 's/mp4//' | sed 's/mkv//' | sed 's/avi//')
