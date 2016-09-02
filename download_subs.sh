@@ -108,11 +108,14 @@ done
 }
 
 function search(){
-
+   p=$PWD
+   ignore=$p/"ignore"
    file=$(echo "$1" | sed 's/mp4//'  | sed 's/srt//' | sed 's/mkv//' | sed 's/avi//' )
    name=$file"srt"
-   if [ ! -f "$name" ] ; then 
-	   echo "# No existe sub para: $1"
+   if [ ! -f "$ignore" ] ; then 
+      if [ ! -f "$name" ] ; then 
+  	   echo "# No existe sub para: $1"
+      fi
    fi
 }
 
