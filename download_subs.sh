@@ -216,6 +216,7 @@ if [ "$1" == "search" ] ; then
    else
 	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
    fi
+   echo "Total de archivos procesados: $TOTAL"
    exit
 fi
 
@@ -239,5 +240,4 @@ if [ -d "$SERIES_HOME" ] ; then
 else
 	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
 fi
-
 echo "Total de archivos procesados: $TOTAL"
