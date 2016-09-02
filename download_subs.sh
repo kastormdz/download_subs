@@ -2,7 +2,6 @@
 # download_subs.sh
 # 19/11/2012
 # 08/03/2016
-# 22/08/2016
 # 30/08/2016
 # Author: Cristian Gimenez <cgimenez@gmail.com>
 
@@ -10,7 +9,7 @@
 export SERIES_HOME="/home/samba/series/"
 export VERBOSE=1
 export code=0
-export TOTAL=0
+export FTOTAL=0
 export SERIES_LIST="/tmp/series.html"
 # Tratando de evitar el ban (no les gusta los scripts asi q nos identificamos como un browser mas..)
 export AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
@@ -110,7 +109,7 @@ done
 
 function search(){
    p=$PWD
-   ((TOTAL++))
+   ((FTOTAL++))
    ignore=$p/"ignore"
    file=$(echo "$1" | sed 's/mp4//'  | sed 's/srt//' | sed 's/mkv//' | sed 's/avi//' )
    name=$file"srt"
@@ -127,7 +126,7 @@ function chksub(){
    name=$file"srt"
    EXIST="0"
    NEED="0"
-   ((TOTAL++))
+   ((FTOTAL++))
    #Crear con un "touch ignore" en el directorio de la serie para q no te baje subs de ahi
    ignore=$p/"ignore"
 
@@ -177,12 +176,12 @@ function chksub(){
 
 }
 
-#MAIN################
+# MAIN #########################################################################################################
 
 export -f download
 export -f chksub 
 export -f search
-
+echo "* download_subs.sh * "
 case "$1" in '-l')
  VERBOSE=1
 ;;
@@ -216,7 +215,7 @@ if [ "$1" == "search" ] ; then
    else
 	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
    fi
-   echo "Total de archivos procesados: $TOTAL"
+   echo "# Total de archivos procesados: $FTOTAL"
    exit
 fi
 
@@ -226,6 +225,7 @@ if [  -f "$SERIES_LIST" ] ; then
 	find $SERIES_LIST -mtime +1 -exec rm -f {} \;
 fi	
 if [ ! -f "$SERIES_LIST" ] ; then
+   echo "# Descargando listado de series..."
    wget http://tusubtitulo.com/series.php -qO $SERIES_LIST --user-agent="$AGENT"
 fi
 
@@ -240,4 +240,4 @@ if [ -d "$SERIES_HOME" ] ; then
 else
 	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
 fi
-echo "Total de archivos procesados: $TOTAL"
+echo "# Total de archivos procesados: $FTOTAL"
