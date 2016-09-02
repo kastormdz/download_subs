@@ -18,15 +18,6 @@ export BASE="http://www.tusubtitulo.com"
 export LANGUAGES="6 5"  
 ############### CONFIG #################################################################################################
 
-# Tratando de obtener la lista de codigos 
-if [  -f "$SERIES_LIST" ] ; then
-	# Resfrescando la lista 1 dia, por si hay series nuevas
-	find $SERIES_LIST -mtime +1 -exec rm -f {} \;
-fi	
-if [ ! -f "$SERIES_LIST" ] ; then
-   wget http://tusubtitulo.com/series.php -qO $SERIES_LIST --user-agent="$AGENT"
-fi
-
 function download () {
  
 #Listado de idiomas sacados de http://www.tusubtitulo.com/newsub.php
@@ -116,8 +107,16 @@ done
 
 }
 
-function chksub()
-{
+function search(){
+
+   file=$(echo "$1" | sed 's/mp4//'  | sed 's/srt//' | sed 's/mkv//' | sed 's/avi//' )
+   name=$file"srt"
+   if [ ! -f "$name" ] ; then 
+	   echo "# No existe sub para: $1"
+   fi
+}
+
+function chksub(){
    p=$PWD
    file=$(echo "$1" | sed 's/mp4//'  | sed 's/srt//' | sed 's/mkv//' | sed 's/avi//' )
    name=$file"srt"
@@ -176,21 +175,26 @@ function chksub()
 
 export -f download
 export -f chksub 
+export -f search
 
 case "$1" in '-l')
  VERBOSE=1
 ;;
 '--help')
 clear
-echo "Download Subs Help "
+echo "download_subs.sh Help "
 echo "                   "
-echo "Uso: download_subs.sh [capitulo de la serie] "
+echo "Uso: download_subs.sh [capitulo de la serie] (solo baja el sub del episodio indicado) "
+echo "Uso: download_subs.sh [capitulo de la serie] [url del sub directo] (baja directamente el sub del link)"
+echo "Uso: download_subs.sh search (solo muestra los subs que faltan)"
+echo "Uso: download_subs.sh (busca y trata de bajar todos los subs -default-)"
 echo " "
 exit
 ;;
 
 esac
 
+# soporte download directo pasando la url del sub
 if [ "$2" != "" ] ; then
 	# podes pasar el link directo del sub para q lo baje y lo renombre en caso de no encontrarlo
 	# formato: https://www.tusubtitulo.com/updated/6/51185/0
@@ -199,6 +203,25 @@ if [ "$2" != "" ] ; then
 	wget -q -O "$name" "$2" --referer $BASE  --user-agent="$AGENT"
 	exit
 fi
+
+if [ "$1" == "search" ] ; then
+   if [ -d "$SERIES_HOME" ] ; then
+      find "$SERIES_HOME" \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c "search {}" \; 2>/dev/null
+   else
+	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
+   fi
+   exit
+fi
+
+# Tratando de obtener la lista de codigos 
+if [  -f "$SERIES_LIST" ] ; then
+	# Resfrescando la lista 1 dia, por si hay series nuevas
+	find $SERIES_LIST -mtime +1 -exec rm -f {} \;
+fi	
+if [ ! -f "$SERIES_LIST" ] ; then
+   wget http://tusubtitulo.com/series.php -qO $SERIES_LIST --user-agent="$AGENT"
+fi
+
 
 if [ -f "$1" ] ; then
 	chksub $1
