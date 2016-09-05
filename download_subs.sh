@@ -7,9 +7,7 @@
 
 ################ CONFIG ################################################################################################
 export SERIES_HOME="/home/samba/series/"
-export VERBOSE=1
 export code=0
-export FTOTAL=0
 export SERIES_LIST="/tmp/series.html"
 # Tratando de evitar el ban (no les gusta los scripts asi q nos identificamos como un browser mas..)
 export AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
@@ -109,7 +107,6 @@ done
 
 function search(){
    p=$PWD
-   ((FTOTAL++))
    ignore=$p/"ignore"
    file=$(echo "$1" | sed 's/mp4//'  | sed 's/srt//' | sed 's/mkv//' | sed 's/avi//' )
    name=$file"srt"
@@ -126,7 +123,6 @@ function chksub(){
    name=$file"srt"
    EXIST="0"
    NEED="0"
-   ((FTOTAL++))
    #Crear con un "touch ignore" en el directorio de la serie para q no te baje subs de ahi
    ignore=$p/"ignore"
 
@@ -181,7 +177,9 @@ function chksub(){
 export -f download
 export -f chksub 
 export -f search
+
 echo "* download_subs.sh * "
+
 case "$1" in '-l')
  VERBOSE=1
 ;;
@@ -213,9 +211,8 @@ if [ "$1" == "search" ] ; then
    if [ -d "$SERIES_HOME" ] ; then
       find "$SERIES_HOME" \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c "search {}" \; 2>/dev/null
    else
-	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
+	echo "# No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
    fi
-   echo "# Total de archivos procesados: $FTOTAL"
    exit
 fi
 
@@ -238,6 +235,5 @@ fi
 if [ -d "$SERIES_HOME" ] ; then
    find "$SERIES_HOME" \( -iname \*.mp4 -o -iname \*.mkv -o -iname \*.avi \) -execdir bash -c "chksub {}" \; 2>/dev/null
 else
-	echo "No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
+	echo "# No existe DIR: $SERIES_HOME  para buscar subtitulos.. Editar en CONFIG"
 fi
-echo "# Total de archivos procesados: $FTOTAL"
