@@ -10,7 +10,7 @@ export SERIES_HOME="/home/samba/series/"
 export code=0
 export SERIES_LIST="/tmp/series.html"
 # Tratando de evitar el ban (no les gusta los scripts asi q nos identificamos como un browser mas..)
-export AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36"
+export AGENT="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.92 Safari/537.36"
 export BASE="http://www.tusubtitulo.com"
 #Orden de Lenguaje a Bajar
 export LANGUAGES="6 5"  
@@ -40,10 +40,12 @@ while [ "$1" ];do
 	fi
 	pushd "$DIR" &>/dev/null
 	FILE="$(basename "$ORIGINAL_FILENAME")"
-	SHOW="$(echo "$FILE"|sed -e "s/^\(.*\)\.[sS][0-9]\+[eE][0-9]\+[\.-].*$/\1/g")" 
+	#SHOW="$(echo "$FILE"|sed -e "s/^\(.*\)\.[sS][0-9]\+[eE][0-9]\+[\.-].*$/\1/g")" 
+        #fix para obtener el nombre
+	SHOW="$(echo "$FILE"|sed -e "s/^\(.*\)\.[sS][0-9].*$/\1/g")" 
 	# --------- obteniendo codigo ---------------
 	SHOWNAME=${SHOW//./ } 
-	code="$(cat $SERIES_LIST | grep -o '<a .*href=.*>'| sed -e 's/<a/\n<a/g' | grep -i "$SHOWNAME" | tail -n 1 | cut -d / -f 3 | sed -e 's/\".*$//')"
+	code="$(cat $SERIES_LIST | grep -o '<a .*href=.*>'| sed -e 's/<a/\n<a/g' | grep -i "$SHOWNAME" | tail -n 1 | cut -d / -f 3 | sed -e 's/\".*$//' | sed -s 's/-/ /')"
 	if [ "$code" == "" ] ; then
 	       	echo "No se encontro codigo de serie >>>>$SHOWNAME<<<<< "
 	fi
