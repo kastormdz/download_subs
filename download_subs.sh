@@ -4,6 +4,8 @@
 # 08/03/2016
 # 30/08/2016
 # Author: Cristian Gimenez <cgimenez@gmail.com>
+# git clone https://github.com/kastormdz/download_subs.git
+
 
 ################ CONFIG ################################################################################################
 export SERIES_HOME="/home/samba/series/"
@@ -42,10 +44,11 @@ while [ "$1" ];do
 	FILE="$(basename "$ORIGINAL_FILENAME")"
 	#SHOW="$(echo "$FILE"|sed -e "s/^\(.*\)\.[sS][0-9]\+[eE][0-9]\+[\.-].*$/\1/g")" 
         #fix para obtener el nombre
-	SHOW="$(echo "$FILE"|sed -e "s/^\(.*\)\.[sS][0-9].*$/\1/g")" 
+	SHOW="$(echo "$FILE"| sed -s 's/\-/ /' |sed -e "s/^\(.*\)\.[sS][0-9].*$/\1/g")" 
+	SHOWTMP="$(echo "$FILE"| sed -s 's/\-/ /' |sed -e "s/^\(.*\)\.[sS][0-9].*$/\1/g" | sed -e 's/\.20.*$//')" 
 	# --------- obteniendo codigo ---------------
-	SHOWNAME=${SHOW//./ } 
-	code="$(cat $SERIES_LIST | grep -o '<a .*href=.*>'| sed -e 's/<a/\n<a/g' | grep -i "$SHOWNAME" | tail -n 1 | cut -d / -f 3 | sed -e 's/\".*$//' | sed -s 's/-/ /')"
+	SHOWNAME=${SHOWTMP//./ } 
+	code="$(cat $SERIES_LIST | grep -o '<a .*href=.*>'| sed -e 's/<a/\n<a/g' | grep -i "$SHOWNAME" | tail -n 1 | cut -d / -f 3 | sed -e 's/\".*$//')"
 	if [ "$code" == "" ] ; then
 	       	echo "No se encontro codigo de serie >>>>$SHOWNAME<<<<< "
 	fi
